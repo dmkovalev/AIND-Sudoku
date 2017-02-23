@@ -3,15 +3,6 @@ assignments = []
 rows = 'ABCDEFGHI'
 cols = '123456789'
 
-boxes = cross(rows, cols)
-row_units = [cross(r, cols) for r in rows]
-column_units = [cross(rows, c) for c in cols]
-square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
-unitlist = row_units + column_units + square_units
-units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
-peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
-
-
 def assign_value(values, box, value):
     """
     Please use this function to update your values dictionary!
@@ -36,7 +27,7 @@ def naked_twins(values):
 
 def cross(A, B):
     "Cross product of elements in A and elements in B."
-    return [s+t for s in a for t in b]
+    return [s+t for s in A for t in B]
 
 def grid_values(grid):
     """
@@ -52,7 +43,6 @@ def grid_values(grid):
     for key, value in s.items():
         if s[key] == '.':
             s[key] = '123456789'
-
     return s
 
 def display(values):
@@ -65,7 +55,7 @@ def display(values):
     line = '+'.join(['-'*(width*3)]*3)
     for r in rows:
         print(''.join(values[r+c].center(width)+('|' if c in '36' else '')
-                      for c in cols))
+            for c in cols))
         if r in 'CF': print(line)
     print
 
@@ -80,13 +70,13 @@ def eliminate(values):
     Returns:
         Resulting Sudoku in dictionary form after eliminating values.
     """
-    
+
     for k,v in values.items():
         if len(v) == 1:
             for p in peers[k]:
-                values[p] = values[p].replace(v, '')
-    
-    return values<Paste>
+                assign_value(values,p,values[p].replace(v,''))
+
+    return values
 
 def only_choice(values):
     for unit in unitlist:
@@ -97,7 +87,7 @@ def only_choice(values):
         for k in unit:
             for el in con:
                 if el in values[k]:
-                    values[k] = el
+                    assign_value(values,k,el)
     return values
 
 def reduce_puzzle(values):
@@ -143,7 +133,6 @@ def search(values):
         r = search(new_v)
         if r:
             return r
-    # If you're stuck, see the solution.py tab!
 
 def solve(grid):
     """
@@ -154,6 +143,17 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
+    
+    values = grid_values(diag_sudoku_grid)
+    return search(values)
+
+boxes = cross(rows, cols)
+row_units = [cross(r, cols) for r in rows]
+column_units = [cross(rows, c) for c in cols]
+square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
+unitlist = row_units + column_units + square_units
+units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
+peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
 
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
