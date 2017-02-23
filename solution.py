@@ -1,5 +1,17 @@
 assignments = []
 
+rows = 'ABCDEFGHI'
+cols = '123456789'
+
+boxes = cross(rows, cols)
+row_units = [cross(r, cols) for r in rows]
+column_units = [cross(rows, c) for c in cols]
+square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
+unitlist = row_units + column_units + square_units
+units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
+peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
+
+
 def assign_value(values, box, value):
     """
     Please use this function to update your values dictionary!
@@ -24,7 +36,7 @@ def naked_twins(values):
 
 def cross(A, B):
     "Cross product of elements in A and elements in B."
-    pass
+    return [s+t for s in a for t in b]
 
 def grid_values(grid):
     """
@@ -46,13 +58,35 @@ def grid_values(grid):
 def display(values):
     """
     Display the values as a 2-D grid.
-    Args:
-        values(dict): The sudoku in dictionary form
+    Input: The sudoku in dictionary form
+    Output: None
     """
-    pass
+    width = 1+max(len(values[s]) for s in boxes)
+    line = '+'.join(['-'*(width*3)]*3)
+    for r in rows:
+        print(''.join(values[r+c].center(width)+('|' if c in '36' else '')
+                      for c in cols))
+        if r in 'CF': print(line)
+    print
 
 def eliminate(values):
-    pass
+    """Eliminate values from peers of each box with a single value.
+
+    Go through all the boxes, and whenever there is a box with a single value,
+    eliminate this value from the set of values of all its peers.
+
+    Args:
+        values: Sudoku in dictionary form.
+    Returns:
+        Resulting Sudoku in dictionary form after eliminating values.
+    """
+    
+    for k,v in values.items():
+        if len(v) == 1:
+            for p in peers[k]:
+                values[p] = values[p].replace(v, '')
+    
+    return values<Paste>
 
 def only_choice(values):
     for unit in unitlist:
