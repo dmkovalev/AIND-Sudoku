@@ -21,9 +21,27 @@ def naked_twins(values):
     Returns:
         the values dictionary with the naked twins eliminated from peers.
     """
+    
 
     # Find all instances of naked twins
+    naked_twins = list()
+    for k, v in values.items():
+        naked = False
+        if len(v) == 2:
+            for p in peers[k]:
+                if values[p] == v:
+                    naked = True
+            if naked:
+                naked_twins.append(k)
     # Eliminate the naked twins as possibilities for their peers
+    for nt in naked_twins:
+        for p in peers[nt]:
+            if p not in set(naked_twins):
+                if len(values[p]) > 2:
+                    assign_value(values, p, values[p].replace(values[nt][0],'').replace(values[nt][1],''))
+
+    display(values)
+    return values
 
 def cross(A, B):
     "Cross product of elements in A and elements in B."
@@ -93,6 +111,7 @@ def only_choice(values):
 def reduce_puzzle(values):
     solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
 
+#    values = naked_twins(values)
     # Your code here: Use the Eliminate Strategy
     values = eliminate(values)
     # Your code here: Use the Only Choice Strategy
@@ -158,7 +177,6 @@ peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
     display(solve(diag_sudoku_grid))
-
     try:
         from visualize import visualize_assignments
         visualize_assignments(assignments)
