@@ -3,11 +3,15 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: *Student should provide answer here*
+A: We are searching for pairs of values in unitlist. After that, for each unit
+in unitlist naked twins values are removed from corresponding boxes in the
+units. This is possible since those values can not be in that boxes - that
+would lead to inconsistent board. This is constraint propagation.
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A: We add diagonal unit to unitlist and eliminate, naked_twins and only_choice
+use it during their checks.
 
 ### Install
 

@@ -21,9 +21,8 @@ def naked_twins(values):
     Returns:
         the values dictionary with the naked twins eliminated from peers.
     """
-    
-
     # Find all instances of naked twins
+    # Look just for values of length 2, then add unit if there are naked twins
     naked_twins = dict()
     for k, v in values.items():
         if len(v) == 2:
@@ -35,6 +34,7 @@ def naked_twins(values):
                         else:
                             naked_twins[(k,v)].append(unit)
     # Eliminate the naked twins as possibilities for their peers
+    # eliminate symbol wise
     for k,v in naked_twins.items():
         for unit in v:
             for el in unit:
@@ -111,10 +111,11 @@ def only_choice(values):
 def reduce_puzzle(values):
     solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
 
+    #check naked twins first
+    values = naked_twins(values)
     # Your code here: Use the Eliminate Strategy
     values = eliminate(values)
     # Your code here: Use the Only Choice Strategy
-    values = naked_twins(values)
     values = only_choice(values)
     # Check how many boxes have a determined value, to compare
     solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
@@ -170,6 +171,7 @@ boxes = cross(rows, cols)
 row_units = [cross(r, cols) for r in rows]
 column_units = [cross(rows, c) for c in cols]
 square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
+# add diag units
 diag_units = [[t[0] + t[1] for t in zip(rows,cols)]] + [[t[0] + t[1] for t in zip(rows, reversed(cols))]] 
 unitlist = row_units + column_units + square_units + diag_units
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
