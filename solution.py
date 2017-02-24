@@ -24,23 +24,23 @@ def naked_twins(values):
     
 
     # Find all instances of naked twins
-    naked_twins = list()
+    naked_twins = dict()
     for k, v in values.items():
-        naked = False
         if len(v) == 2:
-            for p in peers[k]:
-                if values[p] == v:
-                    naked = True
-            if naked:
-                naked_twins.append(k)
+            for unit in units[k]:
+                for el in unit:
+                    if values[el] == v and k!=el:
+                        if k not in naked_twins.keys():
+                            naked_twins[(k,v)] = [unit]
+                        else:
+                            naked_twins[(k,v)].append(unit)
     # Eliminate the naked twins as possibilities for their peers
-    for nt in naked_twins:
-        for p in peers[nt]:
-            if p not in set(naked_twins):
-                if len(values[p]) > 2:
-                    assign_value(values, p, values[p].replace(values[nt][0],'').replace(values[nt][1],''))
-
-    display(values)
+    for k,v in naked_twins.items():
+        for unit in v:
+            for el in unit:
+                for symbol in k[1]:
+                    if k[0] != el and (symbol in values[el]) and (len(values[el]) > 2):
+                        assign_value(values, el, values[el].replace(symbol,''))
     return values
 
 def cross(A, B):
@@ -111,10 +111,10 @@ def only_choice(values):
 def reduce_puzzle(values):
     solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
 
-#    values = naked_twins(values)
     # Your code here: Use the Eliminate Strategy
     values = eliminate(values)
     # Your code here: Use the Only Choice Strategy
+    values = naked_twins(values)
     values = only_choice(values)
     # Check how many boxes have a determined value, to compare
     solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
@@ -163,14 +163,15 @@ def solve(grid):
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
     
-    values = grid_values(diag_sudoku_grid)
+    values = grid_values(grid)
     return search(values)
 
 boxes = cross(rows, cols)
 row_units = [cross(r, cols) for r in rows]
 column_units = [cross(rows, c) for c in cols]
 square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
-unitlist = row_units + column_units + square_units
+diag_units = [[t[0] + t[1] for t in zip(rows,cols)]] + [[t[0] + t[1] for t in zip(rows, reversed(cols))]] 
+unitlist = row_units + column_units + square_units + diag_units
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
 
