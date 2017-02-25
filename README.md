@@ -8,10 +8,33 @@ in unitlist naked twins values are removed from corresponding boxes in the
 units. This is possible since those values can not be in that boxes - that
 would lead to inconsistent board. This is constraint propagation.
 
+Naked twins strategy works as follows. If we have two boxes in the same unit
+with same values 'xy', it becomes possible to exclude digits x and y from other
+boxes in the unit. This is possible, because if not true, for example 'x' exists
+in other cell, then x can be excluded from naked twins, which leads to single
+digit 'y' as value in two cells in the unit. Since it starts to break constraints and brings to inconsistency, it is a constraint propagation.
+
+
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
 A: We add diagonal unit to unitlist and eliminate, naked_twins and only_choice
 use it during their checks.
+
+Constraint propagation is the general term for propagating the implications of
+a constraint on one variable onto other variables (from ref). Diagonal sudoku
+is solved with recursive applicatio of naked_twins, eliminate and only_choice
+implementations of constraint propagation rules and search. Naked twins is
+decribed above. 
+
+Elimination works as follows. If a box has some value 'x', then no other boxes
+in a box's peers can have this value.
+
+Only choice works as follows. If exists just one box in a unit, which can be
+assigned just a single value, then it must be assigned this value.
+
+If following constraint propagation rules leave multiple values, then we start
+to do search, which means assigning of the possible values and recursively
+applying constraint propagation.
 
 ### Install
 
